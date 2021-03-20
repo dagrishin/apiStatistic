@@ -1,39 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <p>Hello Boris</p>
-
-
-
-
-
-
-  {{ data }}
-  <table class="table">
+  <table class="table table-bordered">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">Model</th>
+      <th scope="col">№</th>
+      <th scope="col">Enabled</th>
       <th scope="col">Temperature, C°</th>
       <th scope="col">Fan</th>
       <th scope="col">Clock</th>
+      <th scope="col">GPU Voltage</th>
+      <th scope="col">GPU Activity</th>
       <th scope="col">MHS</th>
-      <th scope="col">KHS</th>
+      <th scope="col">Accepted</th>
+      <th scope="col">Rejected</th>
+      <th scope="col">Hardware Errors</th>
     </tr>
   </thead>
   <tbody>
     {% for line in data %}
       <tr>
-        <th scope="row">{{ forloop.counter }}</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
+        <th scope="row">{{ line.Msg }}</th>
+        <td>{{ line.Enabled }}</td>
+        <td>{{ line.Temperature }}</td>
+        <td>{{ line.Fan_Speed }}, {{ line.Fan_Percent }}</td>
+        <td>{{ line.GPU_Clock }}, {{ line.Memory_Clock }}</td>
+        <td>{{ line.GPU_Voltage }}</td>
+        <td>{{ line.GPU_Activity }}</td>
+        <td>{{ line.MHS }}, {{ line.MHS_30s }}</td>
+        <td>{{ line.Accepted }}</td>
+        <td>{{ line.Rejected }}</td>
+        <td>{{ line.Hardware_Errors }}</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
-  {{ data }}
 {% endblock %}
