@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+
+<form action="" method="post">{% csrf_token %}
+    <p>{% trans 'Вы уверены, что хотите удалить' %} "{{ object }}"?</p>
+    <input type="submit" class="btn btn-primary btn-block" value="{% trans 'Delete' %}">
+</form>
+
+
+{% endblock %}
