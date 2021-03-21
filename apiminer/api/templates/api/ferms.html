@@ -1,0 +1,32 @@
+{% extends  'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n static %}
+{% block content %}
+<div class="card-body">
+
+
+    {% for obj in object_list %}
+
+    <div data-id="{{ obj.pk }}">
+    </div>
+    <div class="row  mt-4 border-bottom border-light border-3 p-3">
+
+        <div class="col-sm">
+            <a href="{% url 'api:detail' obj.pk %}">{{ obj.title }}</a>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+    {% csrf_token %}
+    <script>
+    if(!!window.performance && window.performance.navigation.type == 2)
+{
+    window.location.reload();
+}
+
+    </script>
+
+    <script src="{% static 'js/tournament-util.js' %}"></script>
+    {% endblock %}
