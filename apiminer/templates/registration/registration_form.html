@@ -1,0 +1,13 @@
+{% extends "django_registration/registration_base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+<p>Регистрация</p>
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" class="btn btn-primary" value="{% trans 'Submit' %}"/>
+</form>
+{% endblock %}

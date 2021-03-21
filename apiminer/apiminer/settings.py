@@ -14,7 +14,6 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-print(BASE_DIR)
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = 'tmp/email-messages/'
+
 
 # Application definition
 
@@ -40,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'account',
+    'django_registration',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +132,10 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 MEDIA = 'media'
 MEDIA_URL = f'/{MEDIA}/'
 MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA)
+
+
+# Django registration
+ACCOUNT_ACTIVATION_DAYS = 7
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
