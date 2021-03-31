@@ -1,47 +1,53 @@
 import socket
 
 
-def get_inform_gpu(host, port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)
-    try:
-        sock.connect((host, port))
-    except socket.error as e:
-        return [e]
+def _get_value_from_string(string: str) -> str:
+    return string.split('=')[-1]
 
-    # count gpu
-    sock.send(b'config')
-    count_gpu = int(sock.recv(1048).decode().split(',')[5].split('=')[1])
-    print(count_gpu)
-    sock.close()
-    data_list = []
-    for gpu in range(count_gpu):
+
+def _sending_server(host, port, command) -> list:
+
+    try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5)
-        try:
-            sock.connect((host, port))
-        except socket.error as e:
-            return [e]
-        command = f'gpu|{gpu}'
+        sock.connect((host, port))
         sock.send(command.encode())
-        data = sock.recv(1048).decode().split(',')
+        request = sock.recv(1048).decode().split(',')
         sock.close()
+    except socket.error as e:
+        return [e]
+    return request
 
+
+def get_inform_gpu(host, port):
+
+    count_gpu = int(_sending_server(host, port, 'config')[5].split('=')[1])
+    data_list = []
+    for gpu in range(count_gpu):
+        command = f'gpu|{gpu}'
+
+        data = _sending_server(host, port, command)
         gpu_dict = {
-            'Msg': data[3],
-            'Enabled': data[5],
-            'Temperature': data[7],
-            'Fan_Speed': data[8],
-            'Fan_Percent': data[9],
-            'GPU_Clock': data[10],
-            'Memory_Clock': data[11],
-            'GPU_Voltage': data[12],
-            'GPU_Activity': data[13],
-            'MHS': data[15],
-            'MHS_30s': data[16],
-            'Accepted': data[19],
-            'Rejected': data[20],
-            'Hardware_Errors': data[21],
+            'Msg': _get_value_from_string(data[3]),
+            'Enabled': _get_value_from_string(data[5]),
+            'Temperature': _get_value_from_string(data[7]),
+            'Fan_Speed': _get_value_from_string(data[8]),
+            'Fan_Percent': _get_value_from_string(data[9]),
+            'GPU_Clock': _get_value_from_string(data[10]),
+            'Memory_Clock': _get_value_from_string(data[11]),
+            'GPU_Voltage': _get_value_from_string(data[12]),
+            'GPU_Activity': _get_value_from_string(data[13]),
+            'MHS': _get_value_from_string(data[15]),
+            'MHS_30s': _get_value_from_string(data[16]),
+            'Accepted': _get_value_from_string(data[19]),
+            'Rejected': _get_value_from_string(data[20]),
+            'Hardware_Errors': _get_value_from_string(data[21]),
         }
         data_list.append(gpu_dict)
     return data_list
+
+
+if __name__ == '__main__':
+    host = 'abrep.ddns.net'
+    port = 26541
+    print(get_inform_gpu(host, port))
