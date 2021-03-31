@@ -15,6 +15,7 @@ def _sending_server(host, port, command) -> list:
         request = sock.recv(1048).decode().split(',')
         sock.close()
     except socket.error as e:
+        print(e)
         return [False, e]
     return request
 
@@ -54,5 +55,5 @@ def get_inform_gpu(host, port):
 
 if __name__ == '__main__':
     host = 'abrep.ddns.net'
-    port = 7776
+    port = 26541
     print(get_inform_gpu(host, port))

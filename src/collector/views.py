@@ -9,17 +9,17 @@ from django.views.generic import CreateView, ListView, DetailView, FormView, Upd
 from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
 
-from .forms import CreateFermaForm
-from .models import Ferma
-from .utils import get_inform_gpu
+from .forms import CreateInformerForm
+from .models import Informer
+from .utilites import get_inform_gpu
 
 
-class FermaGetMixin(object):
+class InformerGetMixin(object):
 
     def get(self, *args, **kwargs):
-        ferma_id = kwargs['pk']
-        for ferma in Ferma.objects.filter(pk=ferma_id):
-            user = ferma.user.id
+        informer_id = kwargs['pk']
+        for inform in Informer.objects.filter(pk=informer_id):
+            user = inform.user.id
         if user != self.request.user.id:
             messages.success(
                 self.request,
@@ -38,7 +38,7 @@ class UserAuthMixin(UserPassesTestMixin):
         return HttpResponseRedirect(self.url_redirect)
 
 
-class UserCreateFermaMixin(LoginRequiredMixin, UserPassesTestMixin):
+class UserCreateInformerMixin(LoginRequiredMixin, UserPassesTestMixin):
     url_redirect = reverse_lazy('login')
 
     def test_func(self):
@@ -48,37 +48,40 @@ class UserCreateFermaMixin(LoginRequiredMixin, UserPassesTestMixin):
         return HttpResponseRedirect(self.url_redirect)
 
 
-class FermaAllView(ListView):
-    model = Ferma
-    template_name = 'api/ferms.html'
+class InformerAllView(ListView):
+    model = Informer
+    template_name = 'collector/informers.html'
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
 
 
-class FermaDetailView(LoginRequiredMixin, DetailView):
-    model = Ferma
-    template_name = 'api/api_view.html'
+class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
+    model = Informer
+    template_name = 'collector/collector_view.html'
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        ferma_data = Ferma.objects.filter(pk=self.kwargs.get('pk')).first()
-        info_gpu = get_inform_gpu(host=ferma_data.host, port=ferma_data.port)
+        informer_data = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
+        info_gpu = get_inform_gpu(host=informer_data.host, port=informer_data.port)
         if info_gpu:
             kwargs['data'] = info_gpu
         return kwargs
 
 
-class CreateFermaView(LoginRequiredMixin, FormView):
-    model = Ferma
-    template_name = 'api/create_ferma.html'
-    success_url = reverse_lazy('api:all')
-    form_class = CreateFermaForm
+class CreateInformerView(LoginRequiredMixin, FormView):
+    model = Informer
+    template_name = 'collector/create_informer.html'
+    success_url = reverse_lazy('collector:all')
+    form_class = CreateInformerForm
 
     def form_valid(self, form):
-        instance = Ferma.objects.create(user=self.request.user,
+        instance = Informer.objects.create(user=self.request.user,
                                         title=form.cleaned_data['title'],
                                         host=form.cleaned_data['host'],
                                         port=form.cleaned_data['port'], )
 
-        messages.success(self.request, _(f'Датчик создан'))
+        messages.success(self.request, _(f'информер создан'))
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -86,25 +89,25 @@ class CreateFermaView(LoginRequiredMixin, FormView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class FermaUpdate(
+class InformerUpdate(
         SuccessMessageMixin,
-        FermaGetMixin,
+        InformerGetMixin,
         LoginRequiredMixin,
         UpdateView):
-    """Обновление фермы"""
-    success_url = reverse_lazy('api:all')
-    model = Ferma
-    template_name = 'api/create_ferma.html'
+    """Обновление информера"""
+    success_url = reverse_lazy('collector:all')
+    model = Informer
+    template_name = 'collector/create_informer.html'
     fields = ['title', 'host', 'port']
-    success_message = _('Проукт изменен')
+    success_message = _('информер изменен')
 
 
-class FermaDelete(LoginRequiredMixin, FermaGetMixin, DeleteView):
-    """Класс удаления фермы"""
-    success_url = reverse_lazy('api:all')
-    template_name = 'api/ferma_confirm_delete.html'
-    model = Ferma
+class InformerDelete(LoginRequiredMixin, InformerGetMixin, DeleteView):
+    """Класс удаления информера"""
+    success_url = reverse_lazy('collector:all')
+    template_name = 'collector/informer_confirm_delete.html'
+    model = Informer
 
     def get_success_url(self):
-        messages.success(self.request, _('Ферма удалена'))
+        messages.success(self.request, _('Информер удален'))
         return self.success_url.format(**self.object.__dict__)

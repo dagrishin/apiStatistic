@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'api',
-    'account',
-    'chartapp',
     'django_registration',
     'crispy_forms',
+
+    'collector',
+    'chart',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +143,4 @@ ACCOUNT_ACTIVATION_DAYS = 7
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'

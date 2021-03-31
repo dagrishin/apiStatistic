@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0001_initial'),
+        ('collector', '0001_initial'),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='ferma',
+            model_name='informer',
             old_name='ip',
             new_name='host',
         ),
