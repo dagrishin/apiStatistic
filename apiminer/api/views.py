@@ -61,7 +61,8 @@ class FermaDetailView(LoginRequiredMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
         ferma_data = Ferma.objects.filter(pk=self.kwargs.get('pk')).first()
         info_gpu = get_inform_gpu(host=ferma_data.host, port=ferma_data.port)
-        kwargs['data'] = info_gpu
+        if info_gpu:
+            kwargs['data'] = info_gpu
         return kwargs
 
 

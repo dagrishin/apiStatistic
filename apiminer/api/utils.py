@@ -15,18 +15,23 @@ def _sending_server(host, port, command) -> list:
         request = sock.recv(1048).decode().split(',')
         sock.close()
     except socket.error as e:
-        return [e]
+        return [False, e]
     return request
 
 
 def get_inform_gpu(host, port):
-
+    data = _sending_server(host, port, 'config')
+    if not data[0]:
+        return False
     count_gpu = int(_sending_server(host, port, 'config')[5].split('=')[1])
     data_list = []
     for gpu in range(count_gpu):
         command = f'gpu|{gpu}'
-
         data = _sending_server(host, port, command)
+        if not data[0]:
+            return False
+        if list(data) == 1:
+            return ['connect error']
         gpu_dict = {
             'Msg': _get_value_from_string(data[3]),
             'Enabled': _get_value_from_string(data[5]),
@@ -49,5 +54,5 @@ def get_inform_gpu(host, port):
 
 if __name__ == '__main__':
     host = 'abrep.ddns.net'
-    port = 26541
+    port = 7776
     print(get_inform_gpu(host, port))
