@@ -105,5 +105,5 @@ class FermaDelete(LoginRequiredMixin, FermaGetMixin, DeleteView):
     model = Ferma
 
     def get_success_url(self):
-        messages.success(self.request, _('Товар удален'))
+        messages.success(self.request, _('Ферма удалена'))
         return self.success_url.format(**self.object.__dict__)
