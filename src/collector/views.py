@@ -8,10 +8,34 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, FormView, UpdateView, DeleteView
 from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from .forms import CreateInformerForm
-from .models import Informer
+from .models import Informer, InformerData
 from .utilites import get_inform_gpu
+
+
+def add_informer_data(informer_id, informer_data):
+    date = timezone.now()
+    for data in informer_data:
+        obj = InformerData.objects.create(
+            informer_id=informer_id,
+            date=date,
+            msg=data['msg'],
+            enable=data['enabled'],
+            temperature=float(data['temperature']),
+            fan_speed=int(data['fan_speed']),
+            fan_percent=int(data['fan_percent']),
+            gpu_clock=int(data['gpu_clock']),
+            memory_clock=int(data['memory_clock']),
+            gpu_voltage=float(data['gpu_voltage']),
+            gpu_activity=int(data['gpu_activity']),
+            mhs=float(data['mhs']),
+            mhs_30s=float(data['mhs_30s']),
+            accepted=int(data['accepted']),
+            rejected=int(data['rejected']),
+            error=int(data['error']))
+        print(obj)
 
 
 class InformerGetMixin(object):
@@ -48,7 +72,7 @@ class UserCreateInformerMixin(LoginRequiredMixin, UserPassesTestMixin):
         return HttpResponseRedirect(self.url_redirect)
 
 
-class InformerAllView(ListView):
+class InformerAllView(LoginRequiredMixin, ListView):
     model = Informer
     template_name = 'collector/informers.html'
 
@@ -58,12 +82,14 @@ class InformerAllView(ListView):
 
 class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
     model = Informer
-    template_name = 'collector/collector_view.html'
+    template_name = 'collector/informer_view.html'
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         informer_data = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
         info_gpu = get_inform_gpu(host=informer_data.host, port=informer_data.port)
+        add_informer_data(informer_id=informer_data.id,
+                          informer_data=info_gpu)
         if info_gpu:
             kwargs['data'] = info_gpu
         return kwargs
@@ -77,9 +103,9 @@ class CreateInformerView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         instance = Informer.objects.create(user=self.request.user,
-                                        title=form.cleaned_data['title'],
-                                        host=form.cleaned_data['host'],
-                                        port=form.cleaned_data['port'], )
+                                           title=form.cleaned_data['title'],
+                                           host=form.cleaned_data['host'],
+                                           port=form.cleaned_data['port'], )
 
         messages.success(self.request, _(f'информер создан'))
         return super().form_valid(form)
@@ -90,10 +116,10 @@ class CreateInformerView(LoginRequiredMixin, FormView):
 
 
 class InformerUpdate(
-        SuccessMessageMixin,
-        InformerGetMixin,
-        LoginRequiredMixin,
-        UpdateView):
+    SuccessMessageMixin,
+    InformerGetMixin,
+    LoginRequiredMixin,
+    UpdateView):
     """Обновление информера"""
     success_url = reverse_lazy('collector:all')
     model = Informer

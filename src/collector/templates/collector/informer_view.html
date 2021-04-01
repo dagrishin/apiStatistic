@@ -20,17 +20,17 @@
   <tbody>
     {% for line in data %}
       <tr>
-        <th scope="row">{{ line.Msg }}</th>
-        <td>{{ line.Enabled }}</td>
-        <td>{{ line.Temperature }}</td>
-        <td>{{ line.Fan_Speed }}, {{ line.Fan_Percent }}</td>
-        <td>{{ line.GPU_Clock }}, {{ line.Memory_Clock }}</td>
-        <td>{{ line.GPU_Voltage }}</td>
-        <td>{{ line.GPU_Activity }}</td>
-        <td>{{ line.MHS }}, {{ line.MHS_30s }}</td>
-        <td>{{ line.Accepted }}</td>
-        <td>{{ line.Rejected }}</td>
-        <td>{{ line.Hardware_Errors }}</td>
+        <th scope="row">{{ line.msg }}</th>
+        <td>{{ line.enabled }}</td>
+        <td>{{ line.temperature }}</td>
+        <td>{{ line.fan_speed }}, {{ line.fan_percent }}%</td>
+        <td>{{ line.gpu_clock }}, {{ line.memory_clock }}</td>
+        <td>{{ line.gpu_voltage }}</td>
+        <td>{{ line.gpu_activity }}</td>
+        <td>{{ line.mhs }}, {{ line.mhs_30s }}</td>
+        <td>{{ line.accepted }}</td>
+        <td>{{ line.rejected }}</td>
+        <td>{{ line.error }}</td>
       </tr>
     {% endfor %}
   </tbody>
