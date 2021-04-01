@@ -42,12 +42,25 @@ class InformerGetMixin(object):
 
     def get(self, *args, **kwargs):
         informer_id = kwargs['pk']
+        user_informer = None
         for inform in Informer.objects.filter(pk=informer_id):
-            user = inform.user.id
-        if user != self.request.user.id:
+            user_informer = inform.user.id
+        if not user_informer or user_informer != self.request.user.id:
             messages.success(
                 self.request,
-                _(f'Вы не имеете права редактировать данный контент'))
+                _(f'Вы не имеете права редактировать данный контент или контента не существует'))
+            return HttpResponseRedirect('/')
+        return super().get(self.request, *args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        informer_id = kwargs['pk']
+        user_informer = None
+        for inform in Informer.objects.filter(pk=informer_id):
+            user_informer = inform.user.id
+        if not user_informer or user_informer != self.request.user.id:
+            messages.success(
+                self.request,
+                _(f'Вы не имеете права редактировать данный контент или контента не существует'))
             return HttpResponseRedirect('/')
         return super().get(self.request, *args, **kwargs)
 
@@ -88,10 +101,11 @@ class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
         informer_data = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
         info_gpu = get_inform_gpu(host=informer_data.host, port=informer_data.port)
-        add_informer_data(informer_id=informer_data.id,
-                          informer_data=info_gpu)
+
         if info_gpu:
             kwargs['data'] = info_gpu
+            add_informer_data(informer_id=informer_data.id,
+                              informer_data=info_gpu)
         return kwargs
 
 

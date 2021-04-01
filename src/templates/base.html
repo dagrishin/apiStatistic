@@ -11,6 +11,11 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-8">
+          <!-- Message -->
+            {% if messages %}
+                {% include 'includes/inc_message.html' %}
+            {% endif %}
+        <!-- Main -->
           <h1 class="mt-2">API Miner</h1>
           <hr class="mt-0 mb-4">
           {% block content %}
