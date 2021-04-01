@@ -4,11 +4,17 @@ from django.contrib.auth.models import User
 
 
 class Informer(models.Model):
-
+    TIME_OUT_CHOICES = [
+        (0.5, 0.5),
+        (1, 1),
+        (5, 5),
+        (10, 10),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     host = models.CharField(max_length=250)
     port = models.IntegerField()
+    timeout = models.IntegerField(choices=TIME_OUT_CHOICES, default=1)
 
     def __str__(self):
         return f'{self.title}'
@@ -16,7 +22,7 @@ class Informer(models.Model):
 
 class InformerData(models.Model):
     informer = models.ForeignKey(Informer, on_delete=models.CASCADE)
-    date = models.DateField()
+    date = models.DateTimeField()
     msg = models.CharField(max_length=100)
     enable = models.CharField(max_length=100)
     temperature = models.FloatField()
@@ -31,5 +37,8 @@ class InformerData(models.Model):
     accepted = models.IntegerField()
     rejected = models.IntegerField()
     error = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.informer.title}'
 
 
