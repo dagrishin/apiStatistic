@@ -16,7 +16,7 @@ class Informer(models.Model):
 
 class InformerData(models.Model):
     informer = models.ForeignKey(Informer, on_delete=models.CASCADE)
-    date = models.DateField()
+    date = models.DateTimeField()
     msg = models.CharField(max_length=100)
     enable = models.CharField(max_length=100)
     temperature = models.FloatField()
