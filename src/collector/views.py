@@ -47,7 +47,7 @@ class InformerGetMixin(object):
         for inform in Informer.objects.filter(pk=informer_id):
             user_informer = inform.user.id
         if not user_informer or user_informer != self.request.user.id:
-            messages.success(
+            messages.error(
                 self.request,
                 _(f'Вы не имеете права редактировать данный контент или контента не существует'))
             return HttpResponseRedirect('/')
