@@ -3,31 +3,15 @@
 {% load i18n static %}
 {% block content %}
 <div class="card">
-<div class="card-body">
-
-
-    {% for obj in object_list %}
-
-    <div data-id="{{ obj.pk }}">
+    <div class="card-header">
+         <a href="{% url 'informer:add' %}" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Add Informer</a>
     </div>
-    <div class="row  mt-4 border-bottom border-light border-3 p-3">
-
-        <div class="col-sm">
-            <h4><a href="{% url 'collector:detail' obj.pk %}">{{ obj.title }}</a></h4>
-        </div>
-
-    </div>
-    {% endfor %}
 </div>
-</div>
-    {% csrf_token %}
-    <script>
-    if(!!window.performance && window.performance.navigation.type == 2)
-{
-    window.location.reload();
-}
+    {% for data in informers_data %}
+    {% include 'collector/informer_view.html' with data=data %}
+{% endfor %}
 
-    </script>
 
-    <script src="{% static 'js/tournament-util.js' %}"></script>
+
+
     {% endblock %}

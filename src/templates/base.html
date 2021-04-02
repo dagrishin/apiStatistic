@@ -213,7 +213,11 @@
                         </div>
                     </div>
                 </nav>
-
+                <!-- Message -->
+                {% if messages %}
+                    {% include 'includes/inc_message.html' %}
+                {% endif %}
+        <!-- Main -->
             </header>
 
             <div class="page-heading">

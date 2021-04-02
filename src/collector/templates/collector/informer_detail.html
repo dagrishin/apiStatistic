@@ -1,8 +1,17 @@
+{% extends 'base.html' %}
 
+{% block content %}
 <div class="card">
     <div class="card-header">
-        <a href="{% url 'informer:detail' data.pk %}"><h4>{{ data.title }}</h4></a>
-
+        <h4>{{ data.title }}</h4>
+        <div class="row">
+            <div class="col-lg-6">
+            <a href="{% url 'informer:informer_update' object.pk %}" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Update Informer</a>
+            </div>
+            <div class="col-lg-6">
+                <a href="{% url 'informer:informer_delete' object.pk %}" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Delete Informer</a>
+            </div>
+        </div>
     </div>
     <div class="card-body">
         <table class="table table-bordered table-dark table-striped">
@@ -41,3 +50,4 @@
         </table>
     </div>
 </div>
+{% endblock %}
