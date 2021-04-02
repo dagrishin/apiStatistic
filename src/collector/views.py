@@ -13,7 +13,7 @@ from django.utils import timezone
 
 from .forms import CreateInformerForm
 from .models import Informer, InformerData
-from .utilites import get_inform_gpu
+from .utilites import get_inform_gpu, server_connect
 
 
 def add_informer_data(informer_id, informer_data):
@@ -137,13 +137,20 @@ class CreateInformerView(LoginRequiredMixin, FormView):
     form_class = CreateInformerForm
 
     def form_valid(self, form):
-        instance = Informer.objects.create(user=self.request.user,
-                                           title=form.cleaned_data['title'],
-                                           host=form.cleaned_data['host'],
-                                           port=form.cleaned_data['port'], )
+        host = form.cleaned_data['host']
+        port = form.cleaned_data['port']
+        if server_connect(host, port):
 
-        messages.success(self.request, _(f'информер создан'))
-        return super().form_valid(form)
+            instance = Informer.objects.create(user=self.request.user,
+                                               title=form.cleaned_data['title'],
+                                               host=host,
+                                               port=port, )
+
+            messages.success(self.request, _(f'информер создан'))
+            return super().form_valid(form)
+        messages.error(self.request, _(f'Not connect'))
+        return self.render_to_response(self.get_context_data(form=form))
+
 
     def form_invalid(self, form):
         """If the form is invalid, render the invalid form."""

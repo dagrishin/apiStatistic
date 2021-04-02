@@ -5,6 +5,16 @@ def _get_value_from_string(string: str) -> str:
     return string.split('=')[-1]
 
 
+def server_connect(host, port):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        sock.connect((host, port))
+        sock.close()
+        return True
+    except socket.error as e:
+        print(e)
+        return False
 def _sending_server(host, port, command) -> list:
 
     try:
