@@ -1,7 +1,6 @@
-{% extends "django_registration/registration_base.html" %}
+{% extends "registration/auth.html" %}
 {% load i18n %}
-
-{% block title %}{% trans "Logged out" %}{% endblock %}
+{% block content %}
 
 {% block content %}
 <p>{% trans "Successfully logged out" %}.</p>

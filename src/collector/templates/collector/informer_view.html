@@ -1,38 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">№</th>
-      <th scope="col">Enabled</th>
-      <th scope="col">Temperature, C°</th>
-      <th scope="col">Fan</th>
-      <th scope="col">Clock</th>
-      <th scope="col">GPU Voltage</th>
-      <th scope="col">GPU Activity</th>
-      <th scope="col">MHS</th>
-      <th scope="col">Accepted</th>
-      <th scope="col">Rejected</th>
-      <th scope="col">Hardware Errors</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for line in data %}
-      <tr>
-        <th scope="row">{{ line.msg }}</th>
-        <td>{{ line.enabled }}</td>
-        <td>{{ line.temperature }}</td>
-        <td>{{ line.fan_speed }}, {{ line.fan_percent }}%</td>
-        <td>{{ line.gpu_clock }}, {{ line.memory_clock }}</td>
-        <td>{{ line.gpu_voltage }}</td>
-        <td>{{ line.gpu_activity }}</td>
-        <td>{{ line.mhs }}, {{ line.mhs_30s }}</td>
-        <td>{{ line.accepted }}</td>
-        <td>{{ line.rejected }}</td>
-        <td>{{ line.error }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="card">
+    <div class="card-header">
+        <h4>{{ data.title }}</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-dark table-striped">
+            <thead>
+            <tr>
+                <th scope="col">№</th>
+                <th scope="col">Enabled</th>
+                <th scope="col">Temperature, C°</th>
+                <th scope="col">Fan (speed, percent)</th>
+                <th scope="col">Clock (gpu, memory)</th>
+                <th scope="col">GPU Voltage</th>
+                <th scope="col">GPU Activity</th>
+                <th scope="col">MHS (mhs, mhs 30s)</th>
+                <th scope="col">Accepted</th>
+                <th scope="col">Rejected</th>
+                <th scope="col">Hardware Errors</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for line in data.info_gpu %}
+            <tr>
+                <th scope="row">{{ line.msg }}</th>
+                <td>{{ line.enabled }}</td>
+                <td>{{ line.temperature }}</td>
+                <td><p>{{ line.fan_speed }}</p><p>{{ line.fan_percent }}%</p></td>
+                <td><p>{{ line.gpu_clock }}</p><p>{{ line.memory_clock }}</p></td>
+                <td>{{ line.gpu_voltage }}</td>
+                <td>{{ line.gpu_activity }}</td>
+                <td><p>{{ line.mhs }}</p><p>{{ line.mhs_30s }}</p></td>
+                <td>{{ line.accepted }}</td>
+                <td>{{ line.rejected }}</td>
+                <td>{{ line.error }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

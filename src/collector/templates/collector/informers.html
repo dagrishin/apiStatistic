@@ -2,6 +2,7 @@
 {% load crispy_forms_tags %}
 {% load i18n static %}
 {% block content %}
+<div class="card">
 <div class="card-body">
 
 
@@ -12,13 +13,13 @@
     <div class="row  mt-4 border-bottom border-light border-3 p-3">
 
         <div class="col-sm">
-            <a href="{% url 'collector:detail' obj.pk %}">{{ obj.title }}</a>
+            <h4><a href="{% url 'collector:detail' obj.pk %}">{{ obj.title }}</a></h4>
         </div>
 
     </div>
     {% endfor %}
 </div>
-
+</div>
     {% csrf_token %}
     <script>
     if(!!window.performance && window.performance.navigation.type == 2)

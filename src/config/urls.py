@@ -21,4 +21,5 @@ urlpatterns = [
     path('informer/', include('collector.urls', namespace='informer')),
     path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('core.urls')),
 ]

@@ -99,13 +99,16 @@ class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        informer_data = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
-        info_gpu = get_inform_gpu(host=informer_data.host, port=informer_data.port)
+        informer = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
+        info_gpu = get_inform_gpu(host=informer.host, port=informer.port)
 
         if info_gpu:
-            kwargs['data'] = info_gpu
-            add_informer_data(informer_id=informer_data.id,
+            add_informer_data(informer_id=informer.id,
                               informer_data=info_gpu)
+            title = informer.title
+            data = {'info_gpu': info_gpu}
+            data['title'] = title
+            kwargs['data'] = data
         return kwargs
 
 
