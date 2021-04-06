@@ -39,6 +39,6 @@ class InformerData(models.Model):
     error = models.IntegerField()
 
     def __str__(self):
-        return f'{self.informer.title}'
+        return f'{self.informer.title} {self.msg} {self.date}'
 
 

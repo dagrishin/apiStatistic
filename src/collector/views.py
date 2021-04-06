@@ -2,14 +2,18 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 # from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Avg
+from django.db.models.functions import Cast, ExtractHour, ExtractYear, ExtractDay, ExtractMonth, ExtractMinute
 from django.http import HttpResponse, HttpResponseRedirect
 # from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, FormView
 from django.views.generic.edit import UpdateView, DeleteView
-# from django.views.generic.base import View
+from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+
+from datetime import timedelta
 
 from .forms import CreateInformerForm
 from .models import Informer, InformerData
@@ -98,7 +102,7 @@ class InformerAllView(LoginRequiredMixin, ListView):
             info_gpu = get_inform_gpu(host=informer.host, port=informer.port)
 
             if info_gpu:
-                # add_informer_data(informer_id=informer.id, informer_data=info_gpu)
+                add_informer_data(informer_id=informer.id, informer_data=info_gpu)
                 title = informer.title
                 data = {'info_gpu': info_gpu}
                 data['title'] = title
@@ -111,6 +115,30 @@ class InformerAllView(LoginRequiredMixin, ListView):
         return self.model.objects.filter(user=self.request.user)
 
 
+def get_data_gpu(delta, pk):
+
+    data = InformerData.objects.filter(informer_id=pk, date__gte=timezone.now() - timedelta(hours=delta))
+    msgs = set(data.values_list('msg', flat=True))
+    data_gpu = []
+    for msg in msgs:
+        data_msg = data.filter(msg=msg)
+        date_dict = {
+            1: data_msg.values(hour=ExtractHour('date'), minute=ExtractMinute('date')),
+            24: data_msg.values(hour=ExtractHour('date')),
+            720: data_msg.values(day=ExtractDay('date')),
+            8640: data_msg.values(month=ExtractMonth('date'))
+        }
+        data_list_dict = date_dict[delta].annotate(temperature_avg=Avg('temperature'))
+        os_x = []
+        os_y = []
+        for i in data_list_dict:
+            os_x.append(list(i.values())[0])
+            os_y.append(list(i.values())[1])
+        data_gpu.append({msg: [os_x, os_y]})
+    print(data_gpu)
+    return data_gpu
+
+
 class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
     model = Informer
     template_name = 'collector/informer_detail.html'
@@ -119,14 +147,15 @@ class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
         informer = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
         info_gpu = get_inform_gpu(host=informer.host, port=informer.port)
-
+        delta = 24
+        data_graph_gpu = get_data_gpu(delta, self.kwargs.get('pk'))
         if info_gpu:
-            add_informer_data(informer_id=informer.id,
-                              informer_data=info_gpu)
+            # add_informer_data(informer_id=informer.id, informer_data=info_gpu)
             title = informer.title
             data = {'info_gpu': info_gpu}
             data['title'] = title
             kwargs['data'] = data
+            kwargs['data_graph_gpu'] = data_graph_gpu
         return kwargs
 
 
@@ -185,3 +214,17 @@ class InformerDelete(LoginRequiredMixin, InformerGetMixin, DeleteView):
     def get_success_url(self):
         messages.success(self.request, _('Информер удален'))
         return self.success_url.format(**self.object.__dict__)
+
+
+
+
+
+class GetDataInformerData(ListView):
+    model = InformerData
+    template_name = 'collector/informers.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        pk = 1
+        print(get_data_gpu(8640, pk))
+        return kwargs
