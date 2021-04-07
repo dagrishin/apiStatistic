@@ -1,0 +1,26 @@
+<script>
+    var ctx = document.getElementById('myChart{{ gpu_title|safe }}');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+
+        data: {
+            labels: {{ os_x|safe }},
+            datasets: [{
+                label: '{{ gpu_title|safe }}',
+                data: {{ os_y|safe }},
+                fill: false,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
