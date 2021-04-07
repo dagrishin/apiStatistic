@@ -214,17 +214,3 @@ class InformerDelete(LoginRequiredMixin, InformerGetMixin, DeleteView):
     def get_success_url(self):
         messages.success(self.request, _('Информер удален'))
         return self.success_url.format(**self.object.__dict__)
-
-
-
-
-
-class GetDataInformerData(ListView):
-    model = InformerData
-    template_name = 'collector/informers.html'
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        pk = 1
-        print(get_data_gpu(8640, pk))
-        return kwargs
