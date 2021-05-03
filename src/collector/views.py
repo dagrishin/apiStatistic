@@ -20,7 +20,7 @@ from .models import Informer, InformerData
 from .utilites import get_inform_gpu, server_connect
 
 
-def add_informer_data(informer_id, informer_data):
+def create_informer_data(informer_id, informer_data):
     date = timezone.now()
     for data in informer_data:
         obj = InformerData.objects.create(
@@ -100,17 +100,18 @@ class InformerAllView(LoginRequiredMixin, ListView):
         informers_data = []
         for informer in informers:
             info_gpu = get_inform_gpu(host=informer.host, port=informer.port)
-
             if info_gpu:
-                add_informer_data(informer_id=informer.id, informer_data=info_gpu)
+                data = {}
+                create_informer_data(informer_id=informer.id, informer_data=info_gpu)
                 title = informer.title
-                data = {'info_gpu': info_gpu}
+                data['info_gpu'] = info_gpu
                 data['title'] = title
                 data['pk'] = informer.id
                 informers_data.append(data)
 
         kwargs['informers_data'] = informers_data
         return kwargs
+
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user)
 
@@ -118,7 +119,7 @@ class InformerAllView(LoginRequiredMixin, ListView):
 def get_data_gpu(delta, pk):
 
     data = InformerData.objects.filter(informer_id=pk, date__gte=timezone.now() - timedelta(hours=delta))
-    msgs = set(data.values_list('msg', flat=True))
+    msgs = data.values_list('msg', flat=True).distinct()
     data_gpu = []
     for msg in msgs:
         data_msg = data.filter(msg=msg)
@@ -147,7 +148,7 @@ class InformerDetailView(InformerGetMixin, LoginRequiredMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
         informer = Informer.objects.filter(pk=self.kwargs.get('pk')).first()
         info_gpu = get_inform_gpu(host=informer.host, port=informer.port)
-        delta = 24
+        delta = 720
         data_graph_gpu = get_data_gpu(delta, self.kwargs.get('pk'))
         if info_gpu:
             # add_informer_data(informer_id=informer.id, informer_data=info_gpu)
@@ -179,7 +180,6 @@ class CreateInformerView(LoginRequiredMixin, FormView):
             return super().form_valid(form)
         messages.error(self.request, _(f'Not connect'))
         return self.render_to_response(self.get_context_data(form=form))
-
 
     def form_invalid(self, form):
         """If the form is invalid, render the invalid form."""
